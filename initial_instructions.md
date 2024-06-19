@@ -46,4 +46,4 @@ Existing environment > options (...)
 >
 # git
 
-$ `git init`
+$ `git init .`
