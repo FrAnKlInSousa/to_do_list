@@ -120,6 +120,12 @@ poetry add --group dev pytest pytest-cov
 poetry add --group dev taskipy
 ```
 
+# SQLAlchemy
+
+```commandline
+poetry add sqlalchemy
+```
+
 ### Fonte
 
 * [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
