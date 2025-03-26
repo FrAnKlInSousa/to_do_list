@@ -35,6 +35,7 @@ addopts = '-p no:warnings'
 
 [tool.taskipy.tasks]
 run = 'fastapi dev to_do_list/to_do_list.py'
+run_open = 'fastapi dev to_do_list/to_do_list.py --host 0.0.0.0'
 pre_test = 'task lint'
 test = 'pytest -s -x --cov=to_do_list -vv'
 post_test = 'coverage html'
