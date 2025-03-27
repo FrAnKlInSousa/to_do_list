@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from to_do_list.schemas import UserPublic
+
 
 def test_read_root_deve_retornar_ok_e_ola_mundo(client):
     response = client.get('/')
@@ -31,21 +33,44 @@ def test_create_user(client):
     }
 
 
+def test_create_user_same_username(client, user):
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'Test',
+            'email': 'test2@test.com',
+            'password': '1233',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
+def test_create_user_same_user_email(client, user):
+    response = client.post(
+        '/users/',
+        json={
+            'username': 'Test2',
+            'email': 'test@test.com',
+            'password': '1233',
+        },
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+
+
 def test_read_users(client):
     response = client.get('/users/')
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == {
-        'users': [
-            {
-                'username': 'string',
-                'email': 'user@example.com',
-                'id': 1,
-            }
-        ]
-    }
+    assert response.json() == {'users': []}
 
 
-def test_update_user(client):
+def test_user_with_user(client, user):
+    user_schema = UserPublic.model_validate(user).model_dump()
+    response = client.get('/users/')
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'users': [user_schema]}
+
+
+def test_update_user(client, user):
     response = client.put(
         '/users/1',
         json={
@@ -75,7 +100,7 @@ def test_user_not_found(client):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_user(client):
+def test_delete_user(client, user):
     response = client.delete('/user/1')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
