@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from to_do_list.security import get_password_hash
 from to_do_list.database import get_session
 from to_do_list.models import User
 from to_do_list.schemas import (
@@ -55,7 +55,9 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
             )
 
     db_user = User(
-        username=user.username, email=user.email, password=user.password
+        username=user.username,
+        email=user.email,
+        password=get_password_hash(user.password)
     )
     session.add(db_user)
     session.commit()
@@ -80,7 +82,7 @@ def update_user(
         )
     user_db.username = user.username
     user_db.email = user.email
-    user_db.password = user.password
+    user_db.password = get_password_hash(user.password)
     session.add(user_db)
     session.commit()
     session.refresh(user_db)

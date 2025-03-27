@@ -144,4 +144,10 @@ Aplicando a migração no banco:
 $ `alembic upgrade head`
 ### Fonte
 
+# PWD
+
+```commandline
+poetry add pwdlib[argon2]
+```
+
 * [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
