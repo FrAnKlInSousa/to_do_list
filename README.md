@@ -120,6 +120,28 @@ poetry add --group dev pytest pytest-cov
 poetry add --group dev taskipy
 ```
 
+# SQLAlchemy
+
+```commandline
+poetry add sqlalchemy
+```
+# Extensão do pydantic
+
+```commandline
+poetry add pydantic-settings
+```
+
+# Alembic
+
+```commandline
+poetry add alembic
+```
+Criando a tabela users
+
+$ `alembic revision --autogenerate -m "{message}"`
+
+Aplicando a migração no banco:
+$ `alembic upgrade head`
 ### Fonte
 
 * [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)

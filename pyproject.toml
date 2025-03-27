@@ -10,6 +10,9 @@ readme = "README.md"
 python = "^3.12"
 fastapi = "^0.111.0"
 httpie = "^3.2.2"
+sqlalchemy = "^2.0.39"
+pydantic-settings = "^2.8.1"
+alembic = "^1.15.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.9"
@@ -36,7 +39,7 @@ addopts = '-p no:warnings'
 [tool.taskipy.tasks]
 run = 'fastapi dev to_do_list/to_do_list.py'
 run_open = 'fastapi dev to_do_list/to_do_list.py --host 0.0.0.0'
-pre_test = 'task lint'
+pre_test = 'task format; task lint'
 test = 'pytest -s -x --cov=to_do_list -vv'
 post_test = 'coverage html'
 lint = 'ruff check . --diff'
