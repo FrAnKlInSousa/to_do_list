@@ -9,7 +9,11 @@ from sqlalchemy.orm import Session
 from to_do_list.database import get_session
 from to_do_list.models import User
 from to_do_list.schemas import Message, Token, UserList, UserPublic, UserSchema
-from to_do_list.security import get_password_hash, verify_password
+from to_do_list.security import (
+    create_access_token,
+    get_password_hash,
+    verify_password,
+)
 
 app = FastAPI()
 
@@ -116,8 +120,9 @@ def login_for_access_token(
     session: Session = Depends(get_session),
 ):
     user = session.scalar(select(User).where(User.email == form_data.username))
-
-    if not user or verify_password(form_data.password, user.password):
+    if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(
             HTTPStatus.BAD_REQUEST, detail='Incorrect email or password'
         )
+    access_token = create_access_token(data={'sub': user.email})
+    return {'access_token': access_token, 'token_type': 'Bearer'}

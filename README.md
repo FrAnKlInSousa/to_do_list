@@ -158,8 +158,5 @@ poetry add python-multipart
 poetry add pyjwt
 ```
 
-```commandline
-poetry add 
-```
 
 * [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
