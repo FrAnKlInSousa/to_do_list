@@ -13,6 +13,9 @@ httpie = "^3.2.2"
 sqlalchemy = "^2.0.39"
 pydantic-settings = "^2.8.1"
 alembic = "^1.15.1"
+pwdlib = {extras = ["argon2"], version = "^0.2.1"}
+python-multipart = "^0.0.20"
+pyjwt = "^2.10.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.9"
@@ -39,8 +42,8 @@ addopts = '-p no:warnings'
 [tool.taskipy.tasks]
 run = 'fastapi dev to_do_list/to_do_list.py'
 run_open = 'fastapi dev to_do_list/to_do_list.py --host 0.0.0.0'
-pre_test = 'task format; task lint'
-test = 'pytest -s -x --cov=to_do_list -vv'
+pre_test = 'task lint'
+test = 'pytest -s --cov=to_do_list -vv'
 post_test = 'coverage html'
 lint = 'ruff check . --diff'
 format = 'ruff check . --fix ; ruff format .'
