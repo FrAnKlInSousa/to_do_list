@@ -114,7 +114,7 @@ Path to poetry: {YOUR_HOME}/.local/bin/poetry
 poetry add --group dev ruff
 ```
 ```commandline
-poetry add --group dev pytest pytest-cov factory-boy
+poetry add --group dev pytest pytest-cov factory-boy freezegun
 ```
 ```commandline
 poetry add --group dev taskipy
