@@ -47,6 +47,7 @@ test = 'pytest -s --cov=to_do_list -vv'
 post_test = 'coverage html'
 lint = 'ruff check . --diff'
 format = 'ruff check . --fix ; ruff format .'
+key = 'secrets.token_hex(356)'
 
 [build-system]
 requires = ["poetry-core"]
