@@ -80,6 +80,15 @@ def user(session):
 
 
 @pytest.fixture()
+def other_user(session):
+    other_user = UserFactory()
+    session.add(other_user)
+    session.commit()
+    session.refresh(other_user)
+    return other_user
+
+
+@pytest.fixture()
 def token(client, user):
     data = {'username': user.email, 'password': user.clean_password}
     response = client.post('auth/token', data=data)
