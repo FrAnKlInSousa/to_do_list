@@ -70,45 +70,56 @@ def test_user_with_user(client, user):
     assert response.json() == {'users': [user_schema]}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'frank',
             'email': 'frank@example.com',
-            'id': 1,
+            'id': user.id,
             'password': '1233',
         },
     )
     assert response.json() == {
         'username': 'frank',
         'email': 'frank@example.com',
-        'id': 1,
+        'id': user.id,
     }
 
 
-def test_user_not_found(client):
+def test_update_another_user(client, user, token):
     response = client.put(
-        '/users/5',
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'frank',
             'email': 'frank@example.com',
-            'id': 1,
-            'password': '1234',
+            'id': user.id,
+            'password': '1233',
         },
     )
-    assert response.status_code == HTTPStatus.NOT_FOUND
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
-def test_delete_user(client, user):
-    response = client.delete('/user/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_not_found_user(client):
-    response = client.delete('/user/5')
-    assert response.status_code == HTTPStatus.NOT_FOUND
+def test_delete_another_user(client, user, token):
+    response = client.delete(
+        '/users/2',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Not enough permissions'}
 
 
 def test_read_user_with_id(client):
@@ -139,7 +150,21 @@ def test_get_token(client, user):
         '/token',
         data={'username': user.email, 'password': user.clean_password},
     )
-    token = response.json()
+    test_token = response.json()
     assert response.status_code == HTTPStatus.OK
-    assert token['token_type'] == 'Bearer'
-    assert 'access_token' in token
+    assert test_token['token_type'] == 'Bearer'
+    assert 'access_token' in test_token
+
+
+def test_get_token_incorrect_email(client, user):
+    data = {'username': 'wrong_email@test.com', 'password': user.password}
+    response = client.post('/token', data=data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Incorrect email or password'}
+
+
+def test_get_token_incorrect_password(client, user):
+    data = {'username': user.email, 'password': 'wrongpass'}
+    response = client.post('/token', data=data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json() == {'detail': 'Incorrect email or password'}
