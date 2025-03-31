@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -13,10 +14,12 @@ from to_do_list.security import (
 )
 
 router = APIRouter(prefix='/users', tags=['users'])
+T_Session = Annotated[Session, Depends(get_session)]
+T_CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session = Depends(get_session)):
+def create_user(user: UserSchema, session: T_Session):
     db_user = session.scalar(
         select(User).where(
             (User.username == user.username) | (User.email == user.email)
@@ -47,7 +50,7 @@ def create_user(user: UserSchema, session: Session = Depends(get_session)):
 
 @router.get('/', response_model=UserList)
 def read_users(
-    session: Session = Depends(get_session),
+    session: T_Session,
     limit=10,
     skip=0,
 ):
@@ -56,7 +59,7 @@ def read_users(
 
 
 @router.get('/{user_id}', response_model=UserPublic)
-def read_user(user_id: int, session: Session = Depends(get_session)):
+def read_user(user_id: int, session: T_Session):
     user = session.scalar(select(User).where(User.id == user_id))
     if not user:
         raise HTTPException(
@@ -70,12 +73,12 @@ def read_user(user_id: int, session: Session = Depends(get_session)):
 def update_user(
     user_id: int,
     user: UserSchema,
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user),
+    session: T_Session,
+    current_user: T_CurrentUser,
 ):
     if current_user.id != user_id:
         raise HTTPException(
-            HTTPStatus.UNAUTHORIZED, detail='Not enough permissions'
+            HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
     current_user.username = user.username
     current_user.email = str(user.email)
@@ -89,12 +92,12 @@ def update_user(
 @router.delete('/{user_id}', response_model=Message)
 def delete_user(
     user_id: int,
-    session: Session = Depends(get_session),
-    current_user=Depends(get_current_user),
+    session: T_Session,
+    current_user: T_CurrentUser,
 ):
     if user_id != current_user.id:
         raise HTTPException(
-            HTTPStatus.UNAUTHORIZED, detail='Not enough permissions'
+            HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
     session.delete(current_user)
     session.commit()
