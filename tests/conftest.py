@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from datetime import datetime
 
+import factory
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
@@ -11,6 +12,15 @@ from to_do_list.database import get_session
 from to_do_list.models import User, table_registry
 from to_do_list.security import get_password_hash
 from to_do_list.to_do_list import app
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: f'test{n}')
+    email = factory.LazyAttribute(lambda obj: f'{obj.username}@test.com')
+    password = factory.LazyAttribute(lambda obj: f'{obj.username}+secret')
 
 
 @pytest.fixture()
@@ -61,9 +71,7 @@ def mock_db_time():
 @pytest.fixture()
 def user(session):
     pwd = 'itssecret'
-    user = User(
-        username='Test', email='test@test.com', password=get_password_hash(pwd)
-    )
+    user = UserFactory(password=get_password_hash(pwd))
     session.add(user)
     session.commit()
     session.refresh(user)
