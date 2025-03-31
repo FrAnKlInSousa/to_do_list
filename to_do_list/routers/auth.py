@@ -19,7 +19,7 @@ T_OAuthForm = Annotated[OAuth2PasswordRequestForm, Depends()]
 T_Session = Annotated[Session, Depends(get_session)]
 
 
-@router.post('/token', response_model=Token)
+@router.post('/token', status_code=HTTPStatus.CREATED, response_model=Token)
 def login_for_access_token(
     form_data: T_OAuthForm,
     session: T_Session,

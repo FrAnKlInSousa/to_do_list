@@ -22,7 +22,7 @@ def test_get_token_incorrect_email(client, user):
 
 
 def test_get_token_incorrect_password(client, user):
-    data = {'username': user.email, 'password': 'wrongpass'}
+    data = {'username': user.email, 'password': 'wrong_pass'}
     response = client.post('/auth/token', data=data)
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {'detail': 'Incorrect email or password'}
