@@ -3,8 +3,8 @@ from http import HTTPStatus
 from fastapi import FastAPI, status
 from fastapi.responses import HTMLResponse
 
+from to_do_list.routers import auth, users
 from to_do_list.schemas import Message
-from to_do_list.routers import users, auth
 
 app = FastAPI()
 app.include_router(users.router)
