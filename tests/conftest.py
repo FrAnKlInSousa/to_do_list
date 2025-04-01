@@ -7,11 +7,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
-
+import factory.fuzzy
 from to_do_list.database import get_session
-from to_do_list.models import User, table_registry
+from to_do_list.models import User, table_registry, Todo, TodoState
 from to_do_list.security import get_password_hash
 from to_do_list.to_do_list import app
+
 
 
 class UserFactory(factory.Factory):
@@ -22,6 +23,14 @@ class UserFactory(factory.Factory):
     email = factory.LazyAttribute(lambda obj: f'{obj.username}@test.com')
     password = factory.LazyAttribute(lambda obj: f'{obj.username}+secret')
 
+class TodoFactory(factory.Factory):
+    class Meta:
+        model = Todo
+
+    title = factory.Faker('text')
+    description = factory.Faker('text')
+    state = factory.fuzzy.FuzzyChoice(TodoState)
+    user_id = 1
 
 @pytest.fixture()
 def client(session):
