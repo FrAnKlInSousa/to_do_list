@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from http import HTTPStatus
 
 from freezegun import freeze_time
@@ -44,6 +45,32 @@ def test_token_expire_after_time(client, user):
                 'email': 'wrong@wrong.com',
                 'password': 'wrong',
             },
+        )
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+        assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_refresh_token(client, token):
+    response = client.post(
+        'auth/refresh_token', headers={'Authorization': f'Bearer {token}'}
+    )
+    data = response.json()
+    assert response.status_code == HTTPStatus.CREATED
+    assert 'access_token' in data
+    assert data['token_type'] == 'Bearer'
+
+
+def test_token_expired_dont_refresh(client, user):
+    now = datetime.now()
+    with freeze_time(now):
+        data = {'username': user.email, 'password': user.clean_password}
+        response = client.post('/auth/token', data=data)
+        assert response.status_code == HTTPStatus.CREATED
+        my_token = response.json()['access_token']
+    with freeze_time(now + timedelta(minutes=30)):
+        response = client.post(
+            'auth/refresh_token',
+            headers={'Authorization': f'Bearer {my_token}'},
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         assert response.json() == {'detail': 'Could not validate credentials'}
