@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from to_do_list.database import get_session
-from to_do_list.models import Todo, User
+from to_do_list.models import Todo, TodoState, User
 from to_do_list.schemas import TodoList, TodoPublic, TodoSchema
 from to_do_list.security import get_current_user
 
@@ -36,7 +36,7 @@ def list_todos(  # noqa
     user: CurrentUser,
     title: str | None = None,
     description: str | None = None,
-    state: str | None = None,
+    state: TodoState | None = None,
     skip: int | None = None,
     limit: int | None = None,
 ):
