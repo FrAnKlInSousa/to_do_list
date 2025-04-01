@@ -33,7 +33,6 @@ def test_create_user_same_username(client, user):
 
 
 def test_create_user_same_user_email(client, user):
-    print(user.email)
     response = client.post(
         '/users/',
         json={
