@@ -109,12 +109,12 @@ Base python: ~/.pyenv/versions/3.12.9/bin/python
 Path to poetry: {YOUR_HOME}/.local/bin/poetry
 ```
 
-## Instalando ruff, taskipy, pytest
+## Instalando ruff, taskipy, pytest, factory-boy
 ```commandline
 poetry add --group dev ruff
 ```
 ```commandline
-poetry add --group dev pytest pytest-cov
+poetry add --group dev pytest pytest-cov factory-boy freezegun
 ```
 ```commandline
 poetry add --group dev taskipy
