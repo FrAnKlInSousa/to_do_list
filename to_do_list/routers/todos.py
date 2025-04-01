@@ -2,11 +2,12 @@ from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from to_do_list.database import get_session
 from to_do_list.models import Todo, User
-from to_do_list.schemas import TodoPublic, TodoSchema
+from to_do_list.schemas import TodoList, TodoPublic, TodoSchema
 from to_do_list.security import get_current_user
 
 router = APIRouter(prefix='/todos', tags=['todos'])
@@ -27,3 +28,25 @@ def create_todo(todo: TodoSchema, session: T_Session, user: CurrentUser):
     session.commit()
     session.refresh(db_todo)
     return db_todo
+
+
+@router.get('/', response_model=TodoList)
+def list_todos(  # noqa
+    session: T_Session,
+    user: CurrentUser,
+    title: str | None = None,
+    description: str | None = None,
+    state: str | None = None,
+    skip: int | None = None,
+    limit: int | None = None,
+):
+    query = select(Todo).where(Todo.user_id == user.id)
+    if title:
+        query = query.filter(Todo.title.contains(title))
+    if description:
+        query = query.filter(Todo.description.contains(description))
+    if state:
+        query = query.filter(Todo.state == state)
+
+    todos = session.scalars(query.offset(skip).limit(limit))
+    return {'todos': todos}
