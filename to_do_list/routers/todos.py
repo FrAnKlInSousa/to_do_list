@@ -1,13 +1,13 @@
 from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from to_do_list.database import get_session
 from to_do_list.models import Todo, TodoState, User
-from to_do_list.schemas import TodoList, TodoPublic, TodoSchema
+from to_do_list.schemas import Message, TodoList, TodoPublic, TodoSchema
 from to_do_list.security import get_current_user
 
 router = APIRouter(prefix='/todos', tags=['todos'])
@@ -50,3 +50,18 @@ def list_todos(  # noqa
 
     todos = session.scalars(query.offset(skip).limit(limit))
     return {'todos': todos}
+
+
+@router.delete('/{todo_id}', response_model=Message)
+def delete_todo(todo_id: int, session: T_Session, user: CurrentUser):
+    todo = session.scalar(
+        select(Todo).where(Todo.user_id == user.id, Todo.id == todo_id)
+    )
+    if not todo:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='Task not found.'
+        )
+
+    session.delete(todo)
+    session.commit()
+    return {'message': 'Task has been deleted successfully.'}
