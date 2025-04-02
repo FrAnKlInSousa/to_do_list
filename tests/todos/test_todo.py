@@ -133,3 +133,27 @@ def test_list_todos_filter_combined_should_return_5_todos(
     )
 
     assert expected_todos == len(response.json()['todos'])
+
+
+def test_delete_todo(session, client, user, token):
+    todo = TodoFactory(user_id=user.id)
+    session.add(todo)
+    session.commit()
+
+    response = client.delete(
+        f'/todos/{todo.id}', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()['message'] == 'Task has been deleted successfully.'
+
+
+# 0800 7272 120
+
+
+def test_delete_todo_not_found(client, token):
+    response = client.delete(
+        '/todos/10', headers={'Authorization': f'Bearer {token}'}
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Task not found.'}
